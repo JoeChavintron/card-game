@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {StyleSheet, View,TouchableOpacity,Text, Alert } from 'react-native';
+import {StyleSheet, View,TouchableOpacity,Text, ImageBackground } from 'react-native';
 import Matter, { Bodies, Constraint } from "matter-js"; 
 import { GameEngine } from "react-native-game-engine";
 import Physics from './Physics';
@@ -74,7 +74,7 @@ export default class App extends Component {
 
     render() {
       return (
-        <View style={styles.contaner}>
+        <ImageBackground source={Images.background} style={styles.contaner}>
           <GameEngine
           ref={(ref) => { this.GameEngine = ref; }}
           style={styles.gameContainer}
@@ -87,7 +87,7 @@ export default class App extends Component {
                   <Text style={styles.startGameText}>Tap to Start</Text>
               </View>
           </TouchableOpacity>}
-        </View>
+        </ImageBackground>
       );
     }
 }
@@ -99,9 +99,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: 'black',
     opacity: 0.8,
     justifyContent: 'center',
+    resizeMode: 'stretch',
     alignItems: 'center'
   },
   fullScreen: {
