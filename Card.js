@@ -1,54 +1,82 @@
-import React, { Component } from 'react';
-import { View,Image,TouchableHighlight,Text } from 'react-native';
-import Images from './Images';
+import React, {Component} from 'react';
+import { StyleSheet, View, TouchableWithoutFeedback, Animated,Image,Text,ImageBackground } from 'react-native';
 import Matter, { Bodies, Constraint } from "matter-js"; 
-export default class Card extends Component {
+import { backgroundColor } from 'react-native/Libraries/Components/View/ReactNativeStyleAttributes';
+import Images from './Images';
+ 
+export default class HomeScreen extends Component {
+ 
+  constructor(){
+    super();
+    this.state={
+        imageSelect: Images.card,
+        animation : new Animated.Value(1),
+        pointDisplayState:"none",
+    }
+  }
 
-    
-
-    constructor(props) {
-        super(props)
-        this.state = { 
-            imageSelect: Images.card
-         }
-      }
-
-    onPress = () => {
-        Matter.Events.trigger(this.props.engine, 'tick',this.props.number)    
+  onPress = () => {
+    if (this.state.imageSelect != Images.card) {
+        return
+    }
+    Animated.timing(this.state.animation, {
+        toValue : 0,
+        timing : 5
+      }).start(()=>{
+        Animated.timing(this.state.animation,{
+          toValue : 1,
+          duration : 5
+        }).start();
         this.setState({
-            imageSelect: this.props.imageFront
+            imageSelect: Images.front_card,
+            pointDisplayState:"flex",
         })
+      })
+    // Matter.Events.trigger(this.props.engine, 'tick',this.props.number)    
+    
     }
+
+ 
+  render() {
+ 
+    const animatedStyle ={
+      opacity : this.state.animation
+    }
+
+    const width = this.props.size[0];
+    const height = this.props.size[1];
+    const x = this.props.body.position.x - width / 2;
+    const y = this.props.body.position.y - height / 2;
+    const point = this.props.number;
+    
+    // const point = this.props.randomPoint;
     
 
-    render() {
-        const width = this.props.size[0];
-        const height = this.props.size[1];
-        const x = this.props.body.position.x - width / 2;
-        const y = this.props.body.position.y - height / 2;
-        // const point = this.props.randomPoint;
-        
-        if (this.props.isMainCard == true) {
-            this.state.imageSelect = this.props.imageFront
-        }   
-        
-        
-        return (
-            <View
-            style= {{
-                position: 'absolute',
-                top: y,
-                left: x,
-                width: width,
-                height: height
-            }}>
-                <TouchableHighlight onPress={this.onPress} >
-                    <Image  
-                style={{width: width, height: height}}
-                source={this.state.imageSelect}
-                />
-            </TouchableHighlight>
-        </View>
-        );
-    }
-}
+    return (
+        <View
+        style= {{
+            position: 'absolute',
+            top: y,
+            left: x,
+            width: width,
+            height: height
+        }}>
+            
+         <TouchableWithoutFeedback onPress={this.onPress}>
+            <Animated.View style={[animatedStyle]}> 
+            <ImageBackground source={this.state.imageSelect} style={{width: '100%', height: '100%'}}>
+                <Text 
+                style={{
+                    top: 45,   
+                    color: 'white',
+                    textAlign:"center",
+                    fontSize: 30,   
+                    display:this.state.pointDisplayState    
+                    }}>{point}</Text>
+            </ImageBackground>
+           </Animated.View>
+         </TouchableWithoutFeedback>  
+         </View>
+    );
+  }
+};

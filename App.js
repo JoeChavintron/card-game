@@ -8,16 +8,7 @@ import Constains from './Constants';
 import Card from './Card';
 
 export const randomBetween = () => {
-  
-  let random = Math.floor(Math.random() * 100) + 1 ;
- 
-  if (random >= 60) {
-    return [Images.front_card1,"1"];
-  }
-  if (random >= 50) {
-    return [Images.front_card2,"2"];
-  }   
-  return [Images.front_card1,"3"];  
+  return Math.floor(Math.random() * 100) + 1 ;
 }
 
 export default class App extends Component {
@@ -61,10 +52,9 @@ export default class App extends Component {
       
       return {
         physics: { engine: engine, world: world },
-        card1: { body: card1, size: [100, 150],imageFront: Images.front_card1,engine:engine,number:"1", renderer: Card},
-        card2: { body: card2, size: [100, 150],imageFront : Images.front_card2,engine:engine,number:"2", renderer: Card},
-        card3: { body: card3, size: [100, 150],imageFront: Images.front_card3,engine:engine,number:"3", renderer: Card},
-        mainCard: { body: mainCard, size: [150, 210],imageFront: cardResult[0],isMainCard:true,engine:engine, renderer: Card},
+        card1: { body: card1, size: [100, 150],engine:engine,number:randomBetween(), renderer: Card},
+        card2: { body: card2, size: [100, 150],engine:engine,number:randomBetween(), renderer: Card},
+        card3: { body: card3, size: [100, 150],engine:engine,number:randomBetween(), renderer: Card},
       }
     }
     // onEvent = (e) => {
