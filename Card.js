@@ -1,10 +1,9 @@
 import React, {Component} from 'react';
 import { StyleSheet, View, TouchableWithoutFeedback, Animated,Image,Text,ImageBackground } from 'react-native';
 import Matter, { Bodies, Constraint } from "matter-js"; 
-import { backgroundColor } from 'react-native/Libraries/Components/View/ReactNativeStyleAttributes';
 import Images from './Images';
  
-export default class HomeScreen extends Component {
+export default class Card extends Component {
  
   constructor(){
     super();
@@ -32,7 +31,7 @@ export default class HomeScreen extends Component {
             pointDisplayState:"flex",
         })
       })
-    // Matter.Events.trigger(this.props.engine, 'tick',this.props.number)    
+    Matter.Events.trigger(this.props.engine, 'tick',this.props.tag)    
     
     }
 
@@ -47,7 +46,7 @@ export default class HomeScreen extends Component {
     const height = this.props.size[1];
     const x = this.props.body.position.x - width / 2;
     const y = this.props.body.position.y - height / 2;
-    const point = this.props.number;
+    const point = this.props.point;
     
     // const point = this.props.randomPoint;
     

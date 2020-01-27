@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import {StyleSheet, View,TouchableOpacity,Text, ImageBackground } from 'react-native';
-import Matter, { Bodies, Constraint } from "matter-js"; 
-import { GameEngine } from "react-native-game-engine";
+import {StyleSheet, View,TouchableOpacity,Text, ImageBackground,Alert } from 'react-native';
+import Matter from 'matter-js';
+import { GameEngine } from 'react-native-game-engine';
 import Physics from './Physics';
 import Images from './Images';
 import Constains from './Constants';
@@ -16,10 +16,11 @@ export default class App extends Component {
       super(prop);
       
       this.state = {
-        running: false
+        running: false,
+        point:0
       };
 
-      this.GameEngine = null;
+      this.gameEngine = null;
       this.entities = this.setupWorld();
     }
     
@@ -28,43 +29,59 @@ export default class App extends Component {
       let engine = Matter.Engine.create({ enableSleeping: false });
       let world = engine.world;
     
-      let card1 = Matter.Bodies.rectangle( -130, Constants.MAX_HEIGHT / 2, 100,150, { isStatic: true });
-      let card2 = Matter.Bodies.rectangle( 0, Constants.MAX_HEIGHT / 2, 100,150, { isStatic: true });    
-      let card3 = Matter.Bodies.rectangle( 130, Constants.MAX_HEIGHT / 2, 100,150, { isStatic: true });      
-      let mainCard = Matter.Bodies.rectangle( 0, Constants.MAX_HEIGHT / 3.5, 100,150, { isStatic: true });
-
+      let card1 = Matter.Bodies.rectangle( -130, Constants.MAX_HEIGHT / 2, 90,150, { isStatic: true });
+      let card2 = Matter.Bodies.rectangle( 0, Constants.MAX_HEIGHT / 2, 90,150, { isStatic: true });    
+      let card3 = Matter.Bodies.rectangle( 130, Constants.MAX_HEIGHT / 2, 90,150, { isStatic: true });      
+      
+      let cardPoint1 = randomBetween()
+      let cardPoint2 = randomBetween()
+      let cardPoint3 = randomBetween()
+      
       Matter.World.add(world, [card1, card2, card3]);
 
       let cardResult = randomBetween()
 
-      Matter.Events.on(engine, 'tick', function(event) {
-        
-        if (cardResult[1] == event[0]) {
-          alert("success");
-        } else {
-          alert("fail");
+
+      Matter.Events.on(engine, "tick", (event) => {
+        let tag = event[0]; 
+        switch (tag) {
+          case "1":
+            this.gameEngine.dispatch({ point: cardPoint1});
+            break;
+          case "2":
+            this.gameEngine.dispatch({ point: cardPoint2});
+            break;
+          default: 
+          this.gameEngine.dispatch({ point: cardPoint3});
+            break;
         }
-        //   alert(cardResult[1] + event[0]);
-        // } else {
-        //   alert("error");
-        // }
       });
       
       return {
         physics: { engine: engine, world: world },
-        card1: { body: card1, size: [100, 150],engine:engine,number:randomBetween(), renderer: Card},
-        card2: { body: card2, size: [100, 150],engine:engine,number:randomBetween(), renderer: Card},
-        card3: { body: card3, size: [100, 150],engine:engine,number:randomBetween(), renderer: Card},
+        card1: { body: card1, size: [90, 150],engine:engine,point:cardPoint1,tag:"1",show:false, renderer: Card},
+        card2: { body: card2, size: [90, 150],engine:engine,point:cardPoint2,tag:"2",show:false, renderer: Card},
+        card3: { body: card3, size: [90, 150],engine:engine,point:cardPoint3,tag:"3",show:false, renderer: Card},
       }
     }
-    // onEvent = (e) => {
-    //   if (e.type == "game-over") {
-    //     this.setState({
-    //       running: true
-    //     });  
-    //   }
-    // }
 
+    onEvent = (e) => {
+      if (e.point >= 0) {
+        this.setState({
+          point:e.point
+        });
+      }
+      
+    }
+    
+    reset = () => {
+      this.gameEngine.clear();
+      this.gameEngine.swap(this.setupWorld());
+      this.setState({ 
+        running:true,
+        point:0
+      });
+    }
 
     startGame = () => {
       this.setState({
@@ -76,15 +93,21 @@ export default class App extends Component {
       return (
         <ImageBackground source={Images.background} style={styles.contaner}>
           <GameEngine
-          ref={(ref) => { this.GameEngine = ref; }}
+          ref={(ref) => { this.gameEngine = ref; }}
           style={styles.gameContainer}
           systems={[Physics]}
           running={this.state.running}
+          onEvent={this.onEvent}
           entities={this.entities}>
           </GameEngine>
           {!this.state.running && <TouchableOpacity style={styles.fullScreenButton} onPress={this.startGame}>
               <View style={styles.fullScreen}>
                   <Text style={styles.startGameText}>Tap to Start</Text>
+              </View>
+          </TouchableOpacity>}
+          {this.state.point != 0 && <TouchableOpacity style={styles.fullScreenButton} onPress={this.reset}>
+              <View style={styles.fullScreen}>
+      <Text style={styles.startGameText}>You got {this.state.point}</Text>
               </View>
           </TouchableOpacity>}
         </ImageBackground>
